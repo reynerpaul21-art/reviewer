@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing Quiz — 30 Items</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
+        body{max-width:900px;margin:0 auto;padding:20px;}
+        .back{display:inline-block;margin-bottom:20px;color:#2563eb;text-decoration:none;font-weight:bold;}
+        .question{background:#f5f7fa;padding:20px;border-radius:10px;margin-bottom:20px;}
+        .q-text{font-weight:bold;font-size:1.05em;margin-bottom:12px;}
+        .option{display:block;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:8px;cursor:pointer;transition:0.2s;}
+        .option:hover{border-color:#2563eb;background:#eff6ff;}
+        .correct{border-color:#10b981;background:#ecfdf5;}
+        .wrong{border-color:#ef4444;background:#fef2f2;}
+        .feedback{margin-top:10px;font-weight:bold;}
+        .score{background:#e0e7ff;padding:15px;border-radius:10px;text-align:center;font-size:1.1em;margin-bottom:20px;position:sticky;top:10px;z-index:10;}
+        button{background:#2563eb;color:white;border:none;padding:12px 25px;border-radius:8px;font-size:1em;cursor:pointer;margin:10px 0 30px;}
+        button:hover{background:#1d4ed8;}
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back">← Back to Home</a>
+    <h1>🎨 Drawing Fundamentals — 30 Items</h1>
+    <div class="score" id="score">Score: 0 / 30</div>
+
+    <div id="quiz-container"></div>
+    <button onclick="restartQuiz()">🔄 Restart Quiz</button>
+
+    <script>
+    const questions = [
+        {q:"Which type of drawing expresses ideas, feelings, or imagination?",options:["Technical","Artistic","Mechanical","Architectural"],answer:1},
+        {q:"Drawings used for construction, engineering, and production are called:",options:["Artistic","Technical","Freehand","Decorative"],answer:1},
+        {q:"Drawing done without rulers, compasses, or instruments is called:",options:["Mechanical","Freehand","Orthographic","Perspective"],answer:1},
+        {q:"Drawings made with tools like rulers, triangles, and compasses are:",options:["Freehand","Impressionistic","Mechanical/Instrumental","Sketch"],answer:2},
+        {q:"The most fundamental element of drawing that defines edges and contours is:",options:["Shape","Line","Form","Texture"],answer:1},
+        {q:"A two-dimensional area enclosed by lines is a:",options:["Form","Shape","Volume","Space"],answer:1},
+        {q:"A three-dimensional object with height, width, and depth has:",options:["Shape","Form","Line","Value"],answer:1},
+        {q:"The area around, between, and within objects is called:",options:["Space","Value","Texture","Proportion"],answer:0},
+        {q:"The lightness or darkness of tones or colors is known as:",options:["Texture","Value","Form","Space"],answer:1},
+        {q:"The surface quality — how something feels or looks like it would feel — is:",options:["Value","Texture","Proportion","Form"],answer:1},
+        {q:"The correct size relationship between different parts of an object is:",options:["Value","Proportion","Texture","Space"],answer:1},
+        {q:"Geometric shapes include:",options:["Leaves, clouds, flowers","Circles, squares, triangles","Trees, rocks, rivers","All of the above"],answer:1},
+        {q:"Organic shapes are:",options:["Perfect and symmetrical","Found in nature — free-form","Only used in technical drawing","Made with rulers"],answer:1},
+        {q:"A thick, dark line used to show the outer edge of an object is called a:",options:["Construction line","Outline/Object line","Hidden line","Center line"],answer:1},
+        {q:"Light, thin lines used to guide the drawing process are:",options:["Object lines","Construction lines","Border lines","Section lines"],answer:1},
+        {q:"Lines showing edges not visible from the current viewing angle are:",options:["Visible lines","Hidden lines","Center lines","Dimension lines"],answer:1},
+        {q:"A line showing the exact center of a symmetrical object is a:",options:["Hidden line","Center line","Cutting line","Border line"],answer:1},
+        {q:"Orthographic projection shows:",options:["Only the front view","Multiple 2D views of a 3D object","Everything in perspective","A single realistic image"],answer:1},
+        {q:"The three main views in orthographic projection are:",options:["Top, Bottom, Side","Front, Top, Right Side","Front, Back, Isometric","Left, Right, Perspective"],answer:1},
+        {q:"Isometric drawing shows:",options:["One vanishing point","Two vanishing points","Three axes equally spaced at 120°","A curved perspective"],answer:2},
+        {q:"One-point perspective has:",options:["No vanishing points","One vanishing point on the horizon","Two vanishing points","Three vanishing points"],answer:1},
+        {q:"Two-point perspective is used for:",options:["Flat maps","Objects viewed from directly above","Buildings and objects showing two sides receding","Circular designs"],answer:2},
+        {q:"Shading that gradually changes from light to dark creates:",options:["Flat color","Smooth value transition/Form","Only outlines","A 2D look"],answer:1},
+        {q:"Hatching uses:",options:["Dots of varying size","Crossed lines","Parallel lines to create tone","Solid blocks of black"],answer:2},
+        {q:"Cross-hatching uses:",options:["Single lines","Overlapping sets of parallel lines","Random dots","Curved lines only"],answer:1},
+        {q:"Stippling creates tone using:",options:["Lines","Dots spaced closer or farther apart","Solid color","Brush strokes"],answer:1},
+        {q:"When drawing a human face, eyes are typically positioned at:",options:["The very top","The middle of the head","One-third from the bottom","Near the chin"],answer:1},
+        {q:"In correct proportion, the head is roughly how many eyes wide?",options:["2 eyes","3 eyes","5 eyes","10 eyes"],answer:2},
+        {q:"The first step in sketching an object is usually:",options:["Adding details","Shading","Light blocking of basic shapes","Outlining in dark ink"],answer:2},
+        {q:"Keeping objects that are farther away lighter and less detailed is called:",options:["Atmospheric perspective","Isometric projection","Orthographic projection","Geometric perspective"],answer:0}
+    ];
+
+    let score=0;
+    const container=document.getElementById("quiz-container");
+    const scoreEl=document.getElementById("score");
+
+    function buildQuiz(){
+        container.innerHTML=""; score=0;
+        questions.forEach((q,idx)=>{
+            const qDiv=document.createElement("div");
+            qDiv.className="question";
+            qDiv.innerHTML=`<div class="q-text">${idx+1}. ${q.q}</div>`;
+            q.options.forEach((opt,optIdx)=>{
+                const optDiv=document.createElement("div");
+                optDiv.className="option";
+                optDiv.textContent=opt;
+                optDiv.onclick=()=>checkAnswer(optDiv,optIdx,q.answer,qDiv);
+                qDiv.appendChild(optDiv);
+            });
+            container.appendChild(qDiv);
+        });
+        updateScore();
+    }
+
+    function checkAnswer(el,chosen,correct,qDiv){
+        if(qDiv.dataset.done)return;
+        qDiv.dataset.done="true";
+        const options=qDiv.querySelectorAll(".option");
+        options.forEach((o,i)=>{
+            o.style.pointerEvents="none";
+            if(i===correct)o.classList.add("correct");
+            else if(i===chosen)o.classList.add("wrong");
+        });
+        if(chosen===correct)score++;
+        updateScore();
+    }
+
+    function updateScore(){
+        scoreEl.textContent=`Score: ${score} / 30`;
+    }
+
+    function restartQuiz(){buildQuiz();}
+    buildQuiz();
+    </script>
+</body>
+</html>

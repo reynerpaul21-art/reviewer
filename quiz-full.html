@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Mixed Review — 30 Items</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
+        body{max-width:900px;margin:0 auto;padding:20px;}
+        .back{display:inline-block;margin-bottom:20px;color:#2563eb;text-decoration:none;font-weight:bold;}
+        .question{background:#f5f7fa;padding:20px;border-radius:10px;margin-bottom:20px;}
+        .q-text{font-weight:bold;font-size:1.05em;margin-bottom:12px;}
+        .option{display:block;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:8px;cursor:pointer;transition:0.2s;}
+        .option:hover{border-color:#2563eb;background:#eff6ff;}
+        .correct{border-color:#10b981;background:#ecfdf5;}
+        .wrong{border-color:#ef4444;background:#fef2f2;}
+        .score{background:#e0e7ff;padding:15px;border-radius:10px;text-align:center;font-size:1.1em;margin-bottom:20px;position:sticky;top:10px;z-index:10;}
+        button{background:#2563eb;color:white;border:none;padding:12px 25px;border-radius:8px;font-size:1em;cursor:pointer;margin:10px 0 30px;}
+        button:hover{background:#1d4ed8;}
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back">← Back to Home</a>
+    <h1>📝 Full Mixed Review — 30 Items</h1>
+    <div class="score" id="score">Score: 0 / 30</div>
+
+    <div id="quiz-container"></div>
+    <button onclick="restartQuiz()">🔄 Restart Quiz</button>
+
+    <script>
+    const questions = [
+        {q:"Drawing used for construction and engineering:",options:["Artistic","Technical","Freehand","Decorative"],answer:1},
+        {q:"The most basic element of drawing:",options:["Shape","Line","Color","Texture"],answer:1},
+        {q:"First hand-drawn animated cartoon (1908):",options:["Humorous Phases","Fantasmagorie","Gertie","Steamboat Willie"],answer:1},
+        {q:"Shows weight and flexibility by deforming objects:",options:["Arcs","Squash & Stretch","Timing","Exaggeration"],answer:1},
+        {q:"Correct size relationship between parts:",options:["Value","Proportion","Texture","Form"],answer:1},
+        {q:"First Disney full-length animated feature:",options:["Pinocchio","Snow White","Bambi","Cinderella"],answer:1},
+        {q:"Natural movement follows:",options:["Straight lines","Curved arcs","Right angles","Diagonals"],answer:1},
+        {q:"3D object with volume and depth:",options:["Shape","Form","Space","Value"],answer:1},
+        {q:"Prepares audience before an action:",options:["Staging","Anticipation","Appeal","Timing"],answer:1},
+        {q:"Surface quality / how something feels:",options:["Value","Texture","Proportion","Form"],answer:1},
+        {q:"Drawings done without instruments:",options:["Mechanical","Freehand","Orthographic","Isometric"],answer:1},
+        {q:"First synchronized sound cartoon (1928):",options:["Fantasmagorie","Gertie","Steamboat Willie","Snow White"],answer:2},
+        {q:"Lightness or darkness of tones:",options:["Texture","Value","Form","Space"],answer:1},
+        {q:"Parts keep moving after body stops:",options:["Slow Out","Follow Through","Arcs","Secondary Action"],answer:1},
+        {q:"Two-dimensional area enclosed by lines:",options:["Form","Shape","Volume","Space"],answer:1},
+        {q:"First full 3D CGI feature film:",options:["Shrek","Toy Story","Monsters Inc","Finding Nemo"],answer:1},
+        {q:"More frames at start and end of movement:",options:["Slow In & Slow Out","Fast Forward","Timing","Staging"],answer:0},
+        {q:"Area around and within objects:",options:["Space","Value","Texture","Proportion"],answer:0},
+        {q:"Emphasizing features for clarity and impact:",options:["Exaggeration","Reduction","Realism","Minimization"],answer:0},
+        {q:"Planning key frames first then filling in:",options:["Straight Ahead","Pose-to-Pose","Tweening","Rotoscoping"],answer:1},
+        {q:"Lines showing hidden edges:",options:["Visible lines","Hidden lines","Center lines","Dimension lines"],answer:1},
+        {q:"Device using spinning disc to animate from 1831:",options:["Praxinoscope","Phenakistoscope","Zoetrope","Kinetoscope"],answer:1},
+        {q:"Small movements supporting main action:",options:["Primary","Secondary Action","Overlapping","Anticipation"],answer:1},
+        {q:"Visual story plan before animating:",options:["Keyframe","Storyboard","Exposure sheet","Layout"],answer:1},
+        {q:"Standard smooth animation speed in FPS:",options:["10","24","48","60"],answer:1},
+        {q:"Mirrored animation device with brighter images:",options:["Phenakistoscope","Praxinoscope","Zoetrope","Mutoscope"],answer:1},
+        {q:"Cel animation uses:",options:["Paper only","Transparent sheets/cels","Plastic blocks","Digital tablets"],answer:1},
+        {q:"Atmospheric perspective makes distant objects:",options:["Darker and sharper","Lighter and less detailed","Bigger and bolder","Brighter and saturated"],answer:1},
+        {q:"Appeal in animation means:",options:["Realistic copying","Engaging design & personality","Bright colors","Complex details"],answer:1},
+        {q:"Isometric drawing shows axes at:",options:["90°","120° equal spacing","45°","180°"],answer:1}
+    ];
+
+    let score=0;
+    const container=document.getElementById("quiz-container");
+    const scoreEl=document.getElementById("score");
+
+    function buildQuiz(){
+        container.innerHTML=""; score=0;
+        questions.forEach((q,idx)=>{
+            const qDiv=document.createElement("div");
+            qDiv.className="question";
+            qDiv.innerHTML=`<div class="q-text">${idx+1}. ${q.q}</div>`;
+            q.options.forEach((opt,optIdx)=>{
+                const optDiv=document.createElement("div");
+                optDiv.className="option";
+                optDiv.textContent=opt;
+                optDiv.onclick=()=>checkAnswer(optDiv,optIdx,q.answer,qDiv);
+                qDiv.appendChild(optDiv);
+            });
+            container.appendChild(qDiv);
+        });
+        updateScore();
+    }
+
+    function checkAnswer(el,chosen,correct,qDiv){
+        if(qDiv.dataset.done)return;
+        qDiv.dataset.done="true";
+        const options=qDiv.querySelectorAll(".option");
+        options.forEach((o,i)=>{
+            o.style.pointerEvents="none";
+            if(i===correct)o.classList.add("correct");
+            else if(i===chosen)o.classList.add("wrong");
+        });
+        if(chosen===correct)score++;
+        updateScore();
+    }
+
+    function updateScore(){
+        scoreEl.textContent=`Score: ${score} / 30`;
+    }
+
+    function restartQuiz(){buildQuiz();}
+    buildQuiz();
+    </script>
+</body>
+</html>

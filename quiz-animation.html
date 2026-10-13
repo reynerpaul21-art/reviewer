@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation Quiz — 30 Items</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
+        body{max-width:900px;margin:0 auto;padding:20px;}
+        .back{display:inline-block;margin-bottom:20px;color:#2563eb;text-decoration:none;font-weight:bold;}
+        .question{background:#f5f7fa;padding:20px;border-radius:10px;margin-bottom:20px;}
+        .q-text{font-weight:bold;font-size:1.05em;margin-bottom:12px;}
+        .option{display:block;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:8px;cursor:pointer;transition:0.2s;}
+        .option:hover{border-color:#2563eb;background:#eff6ff;}
+        .correct{border-color:#10b981;background:#ecfdf5;}
+        .wrong{border-color:#ef4444;background:#fef2f2;}
+        .score{background:#e0e7ff;padding:15px;border-radius:10px;text-align:center;font-size:1.1em;margin-bottom:20px;position:sticky;top:10px;z-index:10;}
+        button{background:#2563eb;color:white;border:none;padding:12px 25px;border-radius:8px;font-size:1em;cursor:pointer;margin:10px 0 30px;}
+        button:hover{background:#1d4ed8;}
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back">← Back to Home</a>
+    <h1>🎬 Animation — 30 Items</h1>
+    <div class="score" id="score">Score: 0 / 30</div>
+
+    <div id="quiz-container"></div>
+    <button onclick="restartQuiz()">🔄 Restart Quiz</button>
+
+    <script>
+    const questions = [
+        {q:"Animation creates the illusion of motion by:",options:["Showing a single image continuously","Rapid display of sequential images","Playing video at high volume","Using only 3D models"],answer:1},
+        {q:"The device with spinning discs that created early animation illusions is the:",options:["Praxinoscope","Phenakistoscope","Zoetrope","Kinetoscope"],answer:1},
+        {q:"The Phenakistoscope was invented in:",options:["1831","1895","1926","1906"],answer:0},
+        {q:"The Praxinoscope improved animation by using:",options:["Electric lights","Mirrors for brighter images","Color film","Digital projection"],answer:1},
+        {q:"The first fully animated film on standard film stock (1906):",options:["Fantasmagorie","Humorous Phases of Funny Faces","Gertie the Dinosaur","Steamboat Willie"],answer:1},
+        {q:"Recognized as the first hand-drawn animated cartoon (1908):",options:["Humorous Phases","Fantasmagorie","Gertie","Snow White"],answer:1},
+        {q:"Gertie the Dinosaur (1914) introduced:",options:["Color animation","Keyframing and inbetweening","Computer animation","Digital sound"],answer:1},
+        {q:"Steamboat Willie (1928) is famous for:",options:["Being the first feature film","First synchronized sound cartoon","First 3D animation","First color film"],answer:1},
+        {q:"Steamboat Willie features which character?",options:["Bugs Bunny","Mickey Mouse","Donald Duck","Felix the Cat"],answer:1},
+        {q:"Disney's first full-length animated feature film (1937):",options:["Pinocchio","Snow White and the Seven Dwarfs","Fantasia","Cinderella"],answer:1},
+        {q:"The first full-length 3D CGI animated feature film is:",options:["Shrek","Toy Story","Monsters Inc","Finding Nemo"],answer:1},
+        {q:"Toy Story was released in:",options:["1985","1995","2005","2010"],answer:1},
+        {q:"Deforming an object to show speed, weight, and flexibility is:",options:["Anticipation","Squash & Stretch","Arcs","Exaggeration"],answer:1},
+        {q:"Preparing the audience before an action happens — e.g., bending knees before jumping:",options:["Staging","Anticipation","Follow Through","Timing"],answer:1},
+        {q:"Presenting an idea clearly by focusing attention where it matters:",options:["Staging","Exaggeration","Appeal","Solid Drawing"],answer:0},
+        {q:"Drawing frame-by-frame continuously without planning key poses first is:",options:["Pose-to-Pose","Straight Ahead","Inbetweening","Rotoscoping"],answer:1},
+        {q:"Planning key frames first then filling in the rest is:",options:["Straight Ahead","Pose-to-Pose","Onion Skinning","Tweening"],answer:1},
+        {q:"Parts keep moving after the main body has stopped:",options:["Slow Out","Follow Through & Overlapping Action","Arcs","Secondary Action"],answer:1},
+        {q:"More frames at the start and end of movement, fewer in the middle:",options:["Fast In Fast Out","Slow In & Slow Out","Timing","Staging"],answer:1},
+        {q:"Natural movement in animation typically follows:",options:["Straight lines","Curved paths / Arcs","Right angles","Zigzag paths"],answer:1},
+        {q:"Smaller movements that support the main action — e.g., arm swing while walking:",options:["Primary Action","Secondary Action","Overlapping","Anticipation"],answer:1},
+        {q:"The number of frames used for an action determines its:",options:["Direction","Timing and speed","Color","Style"],answer:1},
+        {q:"Emphasizing features or actions to make them clearer and entertaining:",options:["Exaggeration","Minimization","Realism","Reduction"],answer:0},
+        {q:"Making characters have volume, weight, and dimension — not flat:",options:["Appeal","Solid Drawing","Staging","Arcs"],answer:1},
+        {q:"Design that is pleasing, engaging, and has personality:",options:["Exaggeration","Appeal","Timing","Solid Drawing"],answer:1},
+        {q:"Frames drawn between two key frames to create smooth movement are called:",options:["Keyframes","In-betweens","Storyboards","Layouts"],answer:1},
+        {q:"A visual plan showing the sequence of scenes before animation begins:",options:["Rough draft","Storyboard","Keyframe sheet","Exposure sheet"],answer:1},
+        {q:"Frames Per Second (FPS) standard for smooth animation:",options:["10-12 FPS","24 FPS","60 FPS","100 FPS"],answer:1},
+        {q:"2D animation where characters are drawn on transparent sheets is called:",options:["Digital animation","Cel animation","Stop motion","Motion capture"],answer:1},
+        {q:"Animation using physical objects moved frame-by-frame:",options:["Traditional animation","Stop motion","3D CGI","Vector animation"],answer:1}
+    ];
+
+    let score=0;
+    const container=document.getElementById("quiz-container");
+    const scoreEl=document.getElementById("score");
+
+    function buildQuiz(){
+        container.innerHTML=""; score=0;
+        questions.forEach((q,idx)=>{
+            const qDiv=document.createElement("div");
+            qDiv.className="question";
+            qDiv.innerHTML=`<div class="q-text">${idx+1}. ${q.q}</div>`;
+            q.options.forEach((opt,optIdx)=>{
+                const optDiv=document.createElement("div");
+                optDiv.className="option";
+                optDiv.textContent=opt;
+                optDiv.onclick=()=>checkAnswer(optDiv,optIdx,q.answer,qDiv);
+                qDiv.appendChild(optDiv);
+            });
+            container.appendChild(qDiv);
+        });
+        updateScore();
+    }
+
+    function checkAnswer(el,chosen,correct,qDiv){
+        if(qDiv.dataset.done)return;
+        qDiv.dataset.done="true";
+        const options=qDiv.querySelectorAll(".option");
+        options.forEach((o,i)=>{
+            o.style.pointerEvents="none";
+            if(i===correct)o.classList.add("correct");
+            else if(i===chosen)o.classList.add("wrong");
+        });
+        if(chosen===correct)score++;
+        updateScore();
+    }
+
+    function updateScore(){
+        scoreEl.textContent=`Score: ${score} / 30`;
+    }
+
+    function restartQuiz(){buildQuiz();}
+    buildQuiz();
+    </script>
+</body>
+</html>
